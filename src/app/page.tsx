@@ -24,9 +24,11 @@ export default function Home() {
   };
 
   return (
-    <main className="flex items-center justify-center min-h-screen p-4 bg-gray-50 dark:bg-gray-900">
+    <main className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+
       <div className="w-full max-w-2xl space-y-6">
-        <Card>
+        <Card className="rounded-2xl shadow-xl backdrop-blur-md bg-white/80 dark:bg-black/40">
+
           <CardContent className="space-y-4 mt-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <Input
