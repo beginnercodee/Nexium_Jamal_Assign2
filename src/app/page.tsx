@@ -4,9 +4,9 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { supabase } from "@/lib/supabase";
 import { toast, Toaster } from "sonner";
 import { Loader2 } from "lucide-react";
+import supabase from "@/lib/supabase";
 
 // Urdu Dictionary
 const urduDict: Record<string, string> = {
