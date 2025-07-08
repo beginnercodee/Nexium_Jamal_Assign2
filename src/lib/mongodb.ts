@@ -1,9 +1,12 @@
 import { MongoClient } from "mongodb";
 
-const uri = process.env.MONGODB_URI!;
-const options = {};
+const uri = process.env.MONGODB_URI;
 
-const client = new MongoClient(uri, options);
+if (!uri) {
+  throw new Error("❌ MONGODB_URI is not defined in environment variables");
+}
+
+const client = new MongoClient(uri);
 const clientPromise = client.connect();
 
 export default clientPromise;
