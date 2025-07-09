@@ -1,32 +1,22 @@
+import connectToDatabase from "@/lib/mongodb"; // ✅ Correct
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import clientPromise from "@/lib/mongodb";
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { url, content } = body;
-
-  console.log("📥 Received payload:", body);
-
+export async function POST(req: Request) {
   try {
-    const client = await clientPromise;
-    const db = client.db("blogs");
-    const collection = db.collection("fullContent");
+    const body = await req.json();
+    console.log("📥 Received payload:", body);
 
-    const result = await collection.insertOne({
-      url,
-      content,
-      createdAt: new Date(),
-    });
+    const db = await connectToDatabase();
+    const result = await db.collection("summaries").insertOne(body);
 
     console.log("✅ MongoDB insert result:", result);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ message: "Saved", insertedId: result.insertedId });
   } catch (error) {
-    console.error("❌ MongoDB insert failed:", error);
-    return NextResponse.json(
-      { success: false, error: (error as Error).message },
-      { status: 500 }
-    );
+    console.error("❌ Failed to save:", error);
+    return NextResponse.json({ message: "Failed to save" }, { status: 500 });
   }
 }
+
+console.log("SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+console.log("MONGODB_URI:", process.env.MONGODB_URI);

@@ -1,12 +1,23 @@
+// lib/mongodb.ts
 import { MongoClient } from "mongodb";
 
-const uri = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI!;
+const options = {};
 
-if (!uri) {
-  throw new Error("❌ MONGODB_URI is not defined in environment variables");
+let client: MongoClient;
+const globalWithMongo = global as typeof globalThis & {
+  _mongoClientPromise?: Promise<MongoClient>;
+};
+
+if (!globalWithMongo._mongoClientPromise) {
+  client = new MongoClient(uri, options);
+  globalWithMongo._mongoClientPromise = client.connect();
 }
 
-const client = new MongoClient(uri);
-const clientPromise = client.connect();
+const clientPromise = globalWithMongo._mongoClientPromise!;
 
-export default clientPromise;
+export default async function connectToDatabase() {
+  const client = await clientPromise;
+  const db = client.db(); // optionally: client.db("your-db-name")
+  return db;
+}

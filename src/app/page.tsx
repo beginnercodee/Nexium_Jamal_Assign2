@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -44,12 +44,38 @@ const translateToUrdu = (text: string): string => {
     .join(" ");
 };
 
+type SummaryRow = {
+  id: number;
+  url: string;
+  summary: string;
+};
+
 export default function Home() {
   const [url, setUrl] = useState("");
   const [summary, setSummary] = useState("");
   const [urduTranslation, setUrduTranslation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
+  const [summaries, setSummaries] = useState<SummaryRow[]>([]);
+
+  // Fetch from Supabase
+  useEffect(() => {
+    const fetchSummaries = async () => {
+      const { data, error } = await supabase
+        .from("summaries")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching summaries:", error.message);
+        toast.error("Failed to load saved summaries.");
+      } else {
+        setSummaries(data || []);
+      }
+    };
+
+    fetchSummaries();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +88,7 @@ export default function Home() {
       can rewire your brain and create a more balanced life.
     `;
 
-    // Save content to MongoDB
+    // Save to MongoDB
     const res = await fetch("/api/save-content", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -80,7 +106,7 @@ export default function Home() {
     setSummary(fakeSummary);
     setUrduTranslation(translated);
 
-    // Save summary to Supabase
+    // Save to Supabase
     const { error } = await supabase
       .from("summaries")
       .insert([{ url, summary: fakeSummary }]);
@@ -90,8 +116,12 @@ export default function Home() {
       toast.error("Saved to MongoDB but failed to save to Supabase.");
     } else {
       toast.success("Saved to MongoDB + Supabase!");
-      setShowBanner(true); // ← Show success banner
-      setTimeout(() => setShowBanner(false), 3000); // ← Auto-hide after 3 seconds
+      setShowBanner(true);
+      setTimeout(() => setShowBanner(false), 3000);
+      setSummaries((prev) => [
+        { id: Date.now(), url, summary: fakeSummary },
+        ...prev,
+      ]);
     }
 
     setUrl("");
@@ -103,6 +133,7 @@ export default function Home() {
       <Toaster position="top-right" richColors />
 
       <div className="w-full max-w-2xl space-y-6">
+        {/* 🔹 Form Card */}
         <Card className="rounded-2xl shadow-xl backdrop-blur-md bg-white/80 dark:bg-black/40">
           <CardContent className="space-y-4 mt-6">
             <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-white">
@@ -137,6 +168,7 @@ export default function Home() {
           </CardContent>
         </Card>
 
+        {/* 🔹 Summary Result */}
         {summary && (
           <Card>
             <CardContent className="mt-6 space-y-3">
@@ -146,6 +178,30 @@ export default function Home() {
                 🌐 Urdu Translation:
               </h2>
               <p>{urduTranslation}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 🔹 Display Saved Summaries */}
+        {summaries.length > 0 && (
+          <Card className="bg-white/90 dark:bg-gray-900">
+            <CardContent className="mt-4 space-y-4 max-h-[300px] overflow-y-auto">
+              <h2 className="text-lg font-semibold">🗂 Recent Summaries:</h2>
+              {summaries.map((item) => (
+                <div key={item.id} className="p-3 bg-gray-100 rounded-lg">
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 underline break-all"
+                  >
+                    {item.url}
+                  </a>
+                  <p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap">
+                    {item.summary}
+                  </p>
+                </div>
+              ))}
             </CardContent>
           </Card>
         )}
