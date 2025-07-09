@@ -45,7 +45,7 @@ const translateToUrdu = (text: string): string => {
 };
 
 type SummaryRow = {
-  id: number;
+  id: string;
   url: string;
   summary: string;
 };
@@ -57,6 +57,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
   const [summaries, setSummaries] = useState<SummaryRow[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch from Supabase
   useEffect(() => {
@@ -119,13 +120,28 @@ export default function Home() {
       setShowBanner(true);
       setTimeout(() => setShowBanner(false), 3000);
       setSummaries((prev) => [
-        { id: Date.now(), url, summary: fakeSummary },
+        { id: crypto.randomUUID(), url, summary: fakeSummary },
         ...prev,
       ]);
     }
 
     setUrl("");
     setIsLoading(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    const res = await fetch("/api/delete-summary", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+
+    if (res.ok) {
+      toast.success("Deleted successfully");
+      setSummaries((prev) => prev.filter((s) => s.id !== id));
+    } else {
+      toast.error("Failed to delete");
+    }
   };
 
   return (
@@ -187,21 +203,52 @@ export default function Home() {
           <Card className="bg-white/90 dark:bg-gray-900">
             <CardContent className="mt-4 space-y-4 max-h-[300px] overflow-y-auto">
               <h2 className="text-lg font-semibold">🗂 Recent Summaries:</h2>
-              {summaries.map((item) => (
-                <div key={item.id} className="p-3 bg-gray-100 rounded-lg">
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-600 underline break-all"
+
+              {/* 🔍 Search Input */}
+              <Input
+                placeholder="Search summaries..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full"
+              />
+
+              {/* 🔹 Filtered Summaries */}
+              {summaries
+                .filter(
+                  (item) =>
+                    item.summary
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase()) ||
+                    (item.url?.toLowerCase() || "").includes(
+                      searchQuery.toLowerCase()
+                    )
+                )
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-3 bg-gray-100 rounded-lg relative group"
                   >
-                    {item.url}
-                  </a>
-                  <p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap">
-                    {item.summary}
-                  </p>
-                </div>
-              ))}
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 underline break-all"
+                    >
+                      {item.url}
+                    </a>
+                    <p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap">
+                      {item.summary}
+                    </p>
+
+                    {/* 🗑️ Delete Button (visible on hover) */}
+                    <button
+                      onClick={() => handleDelete(item.id!)}
+                      className="absolute top-2 right-2 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                ))}
             </CardContent>
           </Card>
         )}
