@@ -240,9 +240,9 @@ export default function Home() {
                       {item.summary}
                     </p>
 
-                    {/* 🗑️ Delete Button (visible on hover) */}
+                    {/* 🗑️ Delete Button */}
                     <button
-                      onClick={() => handleDelete(item.id!)}
+                      onClick={() => handleDelete(item.id)}
                       className="absolute top-2 right-2 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition"
                     >
                       🗑️
