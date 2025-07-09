@@ -8,7 +8,6 @@ import { toast, Toaster } from "sonner";
 import { Loader2 } from "lucide-react";
 import supabase from "@/lib/supabase";
 
-// Urdu Dictionary
 const urduDict: Record<string, string> = {
   this: "یہ",
   blog: "بلاگ",
@@ -27,13 +26,11 @@ const urduDict: Record<string, string> = {
   stress: "تناؤ",
 };
 
-// Fake summarizer
 const summarizeBlog = (content: string) => {
   const firstSentence = content.split(".")[0];
   return `${firstSentence.trim()}. (AI Summary)`;
 };
 
-// Urdu Translator
 const translateToUrdu = (text: string): string => {
   return text
     .split(" ")
@@ -59,7 +56,6 @@ export default function Home() {
   const [summaries, setSummaries] = useState<SummaryRow[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch from Supabase
   useEffect(() => {
     const fetchSummaries = async () => {
       const { data, error } = await supabase
@@ -89,7 +85,6 @@ export default function Home() {
       can rewire your brain and create a more balanced life.
     `;
 
-    // Save to MongoDB
     const res = await fetch("/api/save-content", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -107,22 +102,19 @@ export default function Home() {
     setSummary(fakeSummary);
     setUrduTranslation(translated);
 
-    // Save to Supabase
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("summaries")
-      .insert([{ url, summary: fakeSummary }]);
+      .insert([{ url, summary: fakeSummary }])
+      .select();
 
-    if (error) {
-      console.error("Supabase Error:", error.message);
+    if (error || !data || data.length === 0) {
+      console.error("Supabase Error:", error?.message);
       toast.error("Saved to MongoDB but failed to save to Supabase.");
     } else {
       toast.success("Saved to MongoDB + Supabase!");
       setShowBanner(true);
       setTimeout(() => setShowBanner(false), 3000);
-      setSummaries((prev) => [
-        { id: crypto.randomUUID(), url, summary: fakeSummary },
-        ...prev,
-      ]);
+      setSummaries((prev) => [data[0], ...prev]);
     }
 
     setUrl("");
@@ -147,9 +139,7 @@ export default function Home() {
   return (
     <main className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
       <Toaster position="top-right" richColors />
-
       <div className="w-full max-w-2xl space-y-6">
-        {/* 🔹 Form Card */}
         <Card className="rounded-2xl shadow-xl backdrop-blur-md bg-white/80 dark:bg-black/40">
           <CardContent className="space-y-4 mt-6">
             <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-white">
@@ -184,7 +174,6 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        {/* 🔹 Summary Result */}
         {summary && (
           <Card>
             <CardContent className="mt-6 space-y-3">
@@ -198,13 +187,11 @@ export default function Home() {
           </Card>
         )}
 
-        {/* 🔹 Display Saved Summaries */}
         {summaries.length > 0 && (
           <Card className="bg-white/90 dark:bg-gray-900">
             <CardContent className="mt-4 space-y-4 max-h-[300px] overflow-y-auto">
               <h2 className="text-lg font-semibold">🗂 Recent Summaries:</h2>
 
-              {/* 🔍 Search Input */}
               <Input
                 placeholder="Search summaries..."
                 value={searchQuery}
@@ -212,7 +199,6 @@ export default function Home() {
                 className="w-full"
               />
 
-              {/* 🔹 Filtered Summaries */}
               {summaries
                 .filter(
                   (item) =>
@@ -239,8 +225,6 @@ export default function Home() {
                     <p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap">
                       {item.summary}
                     </p>
-
-                    {/* 🗑️ Delete Button */}
                     <button
                       onClick={() => handleDelete(item.id)}
                       className="absolute top-2 right-2 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition"
