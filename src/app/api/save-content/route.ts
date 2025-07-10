@@ -1,22 +1,32 @@
-import connectToDatabase from "@/lib/mongodb"; // ✅ Correct
 import { NextResponse } from "next/server";
+import connectToDatabase from "@/lib/mongodb";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    console.log("📥 Received payload:", body);
+    const { url, content } = await req.json();
+
+    if (!url || !content) {
+      return NextResponse.json(
+        { message: "Missing url or content" },
+        { status: 400 }
+      );
+    }
 
     const db = await connectToDatabase();
-    const result = await db.collection("summaries").insertOne(body);
+    const collection = db.collection("summaries");
 
-    console.log("✅ MongoDB insert result:", result);
+    const result = await collection.insertOne({ url, content, createdAt: new Date() });
 
-    return NextResponse.json({ message: "Saved", insertedId: result.insertedId });
+    if (!result.insertedId) {
+      return NextResponse.json(
+        { message: "Failed to save content" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ message: "Content saved successfully" });
   } catch (error) {
-    console.error("❌ Failed to save:", error);
-    return NextResponse.json({ message: "Failed to save" }, { status: 500 });
+    console.error("Error in /api/save-content:", error);
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
-
-console.log("SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-console.log("MONGODB_URI:", process.env.MONGODB_URI);
