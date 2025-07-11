@@ -75,7 +75,9 @@ export default function Home() {
   };
 
   const handleDelete = async (id: number) => {
-    const confirm = window.confirm("Are you sure you want to delete this summary?");
+    const confirm = window.confirm(
+      "Are you sure you want to delete this summary?"
+    );
     if (!confirm) return;
 
     const { error } = await supabase.from("summaries").delete().eq("id", id);
@@ -91,7 +93,7 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSummary("");
-setUrduTranslation("");
+    setUrduTranslation("");
 
     setIsLoading(true);
 
@@ -137,7 +139,8 @@ setUrduTranslation("");
   };
 
   return (
-    <main className="relative flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+    <main className="relative flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8 bg-gradient-to-tr from-sky-500 via-indigo-600 to-purple-800 overflow-hidden">
+
       <div className="absolute top-4 right-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -155,7 +158,8 @@ setUrduTranslation("");
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Card className="rounded-2xl shadow-xl backdrop-blur-md bg-white/80 dark:bg-black/40">
+          <Card className="rounded-2xl shadow-xl backdrop-blur-lg bg-white/30 dark:bg-black/30 border border-white/20 dark:border-white/10">
+
             <CardContent className="space-y-4 mt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -189,7 +193,9 @@ setUrduTranslation("");
                   className="w-full inline-flex items-center justify-center bg-black text-white py-2 px-4 rounded-md transition hover:bg-gray-800"
                 >
                   {isLoading ? (
-                    <span className="flex items-center gap-2 text-sm">Summarizing...</span>
+                    <span className="flex items-center gap-2 text-sm">
+                      Summarizing...
+                    </span>
                   ) : (
                     "Summarize Blog"
                   )}
@@ -204,18 +210,19 @@ setUrduTranslation("");
 
         {/* Show summarized result */}
         {summary && (
-  <Card className="mt-6 bg-white/70 dark:bg-black/30 rounded-xl">
-    <CardContent className="space-y-3">
-      <h2 className="text-lg font-semibold">📝 AI Summary:</h2>
-      <p>{summary}</p>
-      <h2 className="text-lg font-semibold mt-4">🌐 Urdu Translation:</h2>
-      <p className="text-right font-noto text-base">
-  {urduTranslation}
-</p>
-    </CardContent>
-  </Card>
-)}
-
+          <Card className="mt-6 bg-white/70 dark:bg-black/30 rounded-xl">
+            <CardContent className="space-y-3">
+              <h2 className="text-lg font-semibold">📝 AI Summary:</h2>
+              <p>{summary}</p>
+              <h2 className="text-lg font-semibold mt-4">
+                🌐 Urdu Translation:
+              </h2>
+              <p className="text-right font-noto text-base">
+                {urduTranslation}
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Saved summaries */}
         {savedSummaries.length > 0 && (
