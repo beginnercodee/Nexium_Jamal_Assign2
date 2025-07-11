@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast, Toaster } from "sonner";
 import { Loader2 } from "lucide-react";
 import supabase from "@/lib/supabase";
-import { User } from "@supabase/supabase-js";
 
 const urduDict: Record<string, string> = {
   this: "یہ",
@@ -42,33 +41,42 @@ const translateToUrdu = (text: string): string => {
     .join(" ");
 };
 
+type SummaryRow = {
+  id: string;
+  url: string;
+  summary: string;
+};
+
 export default function Home() {
   const [url, setUrl] = useState("");
   const [summary, setSummary] = useState("");
   const [urduTranslation, setUrduTranslation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [summaries, setSummaries] = useState<SummaryRow[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
+  // Fetch all summaries (no auth)
   useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
+    const fetchSummaries = async () => {
+      const { data, error } = await supabase
+        .from("summaries")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (error) {
+        toast.error("Failed to load summaries");
+        console.error(error);
+      } else {
+        setSummaries(data || []);
+      }
     };
 
-    getUser();
+    fetchSummaries();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!user) {
-      toast.error("Please sign in to save summaries");
-      return;
-    }
-
     setIsLoading(true);
 
     const fakeBlogContent = `
@@ -78,6 +86,7 @@ export default function Home() {
       can rewire your brain and create a more balanced life.
     `;
 
+    // Save to MongoDB
     const res = await fetch("/api/save-content", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -85,26 +94,30 @@ export default function Home() {
     });
 
     if (!res.ok) {
-      toast.error("Failed to save content to MongoDB.");
+      toast.error("Failed to save to MongoDB.");
       setIsLoading(false);
       return;
     }
 
+    // Generate and display
     const fakeSummary = summarizeBlog(fakeBlogContent);
     const translated = translateToUrdu(fakeSummary);
     setSummary(fakeSummary);
     setUrduTranslation(translated);
 
-    const { error } = await supabase
+    // Save to Supabase
+    const { data, error } = await supabase
       .from("summaries")
-      .insert([{ url, summary: fakeSummary, user_id: user.id }]);
+      .insert([{ url, summary: fakeSummary }])
+      .select();
 
     if (error) {
-      console.error("Supabase Error:", error.message);
-      toast.error("Saved to MongoDB but failed to save to Supabase.");
+      toast.error("Saved to MongoDB but failed to Supabase.");
+      console.error(error.message);
     } else {
       toast.success("Saved to MongoDB + Supabase!");
       setShowBanner(true);
+      setSummaries((prev) => [data[0], ...prev]);
       setTimeout(() => setShowBanner(false), 3000);
     }
 
@@ -112,10 +125,19 @@ export default function Home() {
     setIsLoading(false);
   };
 
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from("summaries").delete().eq("id", id);
+    if (error) {
+      toast.error("Delete failed");
+    } else {
+      setSummaries((prev) => prev.filter((s) => s.id !== id));
+      toast.success("Deleted");
+    }
+  };
+
   return (
     <main className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
       <Toaster position="top-right" richColors />
-
       <div className="w-full max-w-2xl space-y-6">
         <Card className="rounded-2xl shadow-xl backdrop-blur-md bg-white/80 dark:bg-black/40">
           <CardContent className="space-y-4 mt-6">
@@ -124,7 +146,7 @@ export default function Home() {
             </h1>
 
             {showBanner && (
-              <div className="bg-green-100 text-green-800 text-sm px-4 py-2 rounded-lg shadow-md transition">
+              <div className="bg-green-100 text-green-800 text-sm px-4 py-2 rounded-lg shadow-md">
                 ✅ Blog summarized and saved successfully!
               </div>
             )}
@@ -158,6 +180,49 @@ export default function Home() {
               <p>{summary}</p>
               <h2 className="text-lg font-semibold mt-4">🌐 Urdu Translation:</h2>
               <p>{urduTranslation}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {summaries.length > 0 && (
+          <Card className="bg-white/90 dark:bg-gray-900">
+            <CardContent className="mt-4 space-y-4 max-h-[300px] overflow-y-auto">
+              <h2 className="text-lg font-semibold">🗂 Recent Summaries:</h2>
+              <Input
+                placeholder="Search summaries..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {summaries
+                .filter(
+                  (item) =>
+                    item.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.url.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-3 bg-gray-100 rounded-lg relative group"
+                  >
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 underline break-all"
+                    >
+                      {item.url}
+                    </a>
+                    <p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap">
+                      {item.summary}
+                    </p>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="absolute top-2 right-2 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                ))}
             </CardContent>
           </Card>
         )}
