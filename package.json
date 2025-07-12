@@ -11,8 +11,8 @@
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
     "@supabase/supabase-js": "^2.50.3",
-    "@tsparticles/preset-stars": "^3.2.0",
-    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/preset-stars": "3",
+    "@tsparticles/react": "3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.0",

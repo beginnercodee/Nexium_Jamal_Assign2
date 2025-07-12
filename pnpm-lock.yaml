@@ -15,10 +15,10 @@ importers:
         specifier: ^2.50.3
         version: 2.50.3
       '@tsparticles/preset-stars':
-        specifier: ^3.2.0
+        specifier: '3'
         version: 3.2.0
       '@tsparticles/react':
-        specifier: ^3.0.0
+        specifier: '3'
         version: 3.0.0(@tsparticles/engine@3.8.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       class-variance-authority:
         specifier: ^0.7.1
