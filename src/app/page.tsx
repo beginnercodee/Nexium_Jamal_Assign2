@@ -40,6 +40,20 @@ const summarizeBlog = (content: string) => {
   return `${firstSentence.trim()}. (AI Summary)`;
 };
 
+const predefinedSummaries: Record<string, { summary: string; urdu: string }> = {
+  "https://example.com/blog1": {
+    summary:
+      "This blog explores how early rising boosts productivity through structure and focus. (AI Summary)",
+    urdu: "یہ بلاگ بتاتا ہے کہ جلدی اٹھنا کس طرح نظم و ضبط اور توجہ کے ذریعے پیداواریت کو بڑھاتا ہے۔",
+  },
+  "https://example.com/blog2": {
+    summary:
+      "This blog discusses the impact of digital detox on mental clarity and overall well-being. (AI Summary)",
+    urdu: "یہ بلاگ ڈیجیٹل ڈٹاکس کے ذہنی وضاحت اور مجموعی صحت پر اثرات پر روشنی ڈالتا ہے۔",
+  },
+};
+
+
 const translateToUrdu = (text: string): string => {
   return text
     .split(" ")
@@ -98,45 +112,56 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const staticEntry = predefinedSummaries[url.trim()];
+if (staticEntry) {
+  setSummary(staticEntry.summary);
+  setUrduTranslation(staticEntry.urdu);
+
+  const { error } = await supabase
+    .from("summaries")
+    .insert([{ url, summary: staticEntry.summary }]);
+
+  if (error) {
+    toast.error("Failed to save static summary to Supabase.");
+  } else {
+    toast.success("Static summary saved successfully!");
+    fetchSummaries();
+    setShowBanner(true);
+    setTimeout(() => setShowBanner(false), 3000);
+  }
+
+  setUrl("");
+  return;
+}
+
     setSummary("");
     setUrduTranslation("");
 
     setIsLoading(true);
 
-    const fakeBlogContent = `
-      Mindfulness has become a major focus in recent years. 
-      It helps people manage stress, increase focus, and improve emotional health. 
-      Daily mindfulness practices such as meditation or breathing exercises 
-      can rewire your brain and create a more balanced life.
-    `;
+    // Simulate fallback blog content summary
+const fallbackContent = `
+  Mindfulness has become a major focus in recent years. 
+  It helps people manage stress, increase focus, and improve emotional health.
+`;
 
-    const res = await fetch("/api/save-content", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url, content: fakeBlogContent }),
-    });
+const fallbackSummary = summarizeBlog(fallbackContent);
+const translated = translateToUrdu(fallbackSummary);
 
-    if (!res.ok) {
-      toast.error("MongoDB save failed", {
-        description: "Check if the API is running.",
-      });
-      setIsLoading(false);
-      return;
-    }
+setSummary(fallbackSummary);
+setUrduTranslation(translated);
 
-    const fakeSummary = summarizeBlog(fakeBlogContent);
-    const translated = translateToUrdu(fakeSummary);
-    setSummary(fakeSummary);
-    setUrduTranslation(translated);
+const { error } = await supabase
+  .from("summaries")
+  .insert([{ url, summary: fallbackSummary }]);
+
+
+setUrl("");
+
 
     setTimeout(() => {
       summaryRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 300);
-
-    const { error } = await supabase
-      .from("summaries")
-      .insert([{ url, summary: fakeSummary }]);
-
     if (error) {
       toast.error("Saved to MongoDB but failed to save to Supabase!", {
         description: "You may want to check your Supabase configuration!",
@@ -222,6 +247,17 @@ export default function Home() {
                   required
                   className="flex-1"
                 />
+                <div className="text-sm text-white/80 dark:text-white/60">
+  Try:
+  <a href="#" onClick={() => setUrl("https://example.com/blog1")} className="underline ml-1">
+    blog1
+  </a>
+  ,
+  <a href="#" onClick={() => setUrl("https://example.com/blog2")} className="underline ml-1">
+    blog2
+  </a>
+</div>
+
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   transition={{ type: "spring", stiffness: 300 }}
