@@ -80,6 +80,6 @@ pnpm dev
 
 ---
 
-📣 Credits
+📣 Credits: 
 Crafted with 💻 by Jamal Nadeem
 GitHub • LinkedIn
