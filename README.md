@@ -33,7 +33,7 @@ An AI-powered blog summarizer with Urdu translation — built using **Next.js**,
 
 ## 📂 Folder Structure
 
-<pre><code>```bash 📦src ┣ 📂app ┃ ┣ 📂api ┃ ┃ ┗ 📂save-content ┃ ┃ ┃ ┗ 📜route.ts ┃ ┣ 📜favicon.ico ┃ ┣ 📜globals.css ┃ ┣ 📜layout.tsx ┃ ┣ 📜page.tsx ┃ ┗ 📜providers.tsx ┣ 📂components ┃ ┣ 📂ui ┃ ┃ ┣ 📜BackgroundBlobs.tsx ┃ ┃ ┣ 📜button.tsx ┃ ┃ ┣ 📜card.tsx ┃ ┃ ┣ 📜input.tsx ┃ ┃ ┣ 📜SummarySkeleton.tsx ┃ ┃ ┗ 📜textarea.tsx ┃ ┣ 📜ParticlesBG.tsx ┃ ┗ 📜ThemeToggle.tsx ┗ 📂lib ┣ 📜mongodb.ts ┣ 📜supabase.ts ┗ 📜utils.ts ```</code></pre>
+<pre><code>``` src ├── app │ ├── api │ │ └── save-content │ │ └── route.ts │ ├── favicon.ico │ ├── globals.css │ ├── layout.tsx │ ├── page.tsx │ └── providers.tsx ├── components │ ├── ui │ │ ├── BackgroundBlobs.tsx │ │ ├── button.tsx │ │ ├── card.tsx │ │ ├── input.tsx │ │ ├── SummarySkeleton.tsx │ │ └── textarea.tsx │ ├── ParticlesBG.tsx │ └── ThemeToggle.tsx └── lib ├── mongodb.ts ├── supabase.ts └── utils.ts ```</code></pre>
 
 ---
 
