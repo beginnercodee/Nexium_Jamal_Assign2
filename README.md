@@ -76,3 +76,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
 
 # 4. Run locally
 pnpm dev
+```
+
+## 📣 Credits
+
+Crafted with 💻 by Jamal Nadeem
+**GitHub:**https://github.com/ • **LinkedIn:**https://www.linkedin.com/in/jamal-nadeem-488480252/
