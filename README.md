@@ -33,30 +33,7 @@ An AI-powered blog summarizer with Urdu translation — built using **Next.js**,
 
 ## 📂 Folder Structure
 
-📦src
- ┣ 📂app
- ┃ ┣ 📂api
- ┃ ┃ ┗ 📂save-content
- ┃ ┃ ┃ ┗ 📜route.ts
- ┃ ┣ 📜favicon.ico
- ┃ ┣ 📜globals.css
- ┃ ┣ 📜layout.tsx
- ┃ ┣ 📜page.tsx
- ┃ ┗ 📜providers.tsx
- ┣ 📂components
- ┃ ┣ 📂ui
- ┃ ┃ ┣ 📜BackgroundBlobs.tsx
- ┃ ┃ ┣ 📜button.tsx
- ┃ ┃ ┣ 📜card.tsx
- ┃ ┃ ┣ 📜input.tsx
- ┃ ┃ ┣ 📜SummarySkeleton.tsx
- ┃ ┃ ┗ 📜textarea.tsx
- ┃ ┣ 📜ParticlesBG.tsx
- ┃ ┗ 📜ThemeToggle.tsx
- ┗ 📂lib
- ┃ ┣ 📜mongodb.ts
- ┃ ┣ 📜supabase.ts
- ┃ ┗ 📜utils.ts
+<pre><code>```bash 📦src ┣ 📂app ┃ ┣ 📂api ┃ ┃ ┗ 📂save-content ┃ ┃ ┃ ┗ 📜route.ts ┃ ┣ 📜favicon.ico ┃ ┣ 📜globals.css ┃ ┣ 📜layout.tsx ┃ ┣ 📜page.tsx ┃ ┗ 📜providers.tsx ┣ 📂components ┃ ┣ 📂ui ┃ ┃ ┣ 📜BackgroundBlobs.tsx ┃ ┃ ┣ 📜button.tsx ┃ ┃ ┣ 📜card.tsx ┃ ┃ ┣ 📜input.tsx ┃ ┃ ┣ 📜SummarySkeleton.tsx ┃ ┃ ┗ 📜textarea.tsx ┃ ┣ 📜ParticlesBG.tsx ┃ ┗ 📜ThemeToggle.tsx ┗ 📂lib ┣ 📜mongodb.ts ┣ 📜supabase.ts ┗ 📜utils.ts ```</code></pre>
 
 ---
 
@@ -76,9 +53,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
 
 # 4. Run locally
 pnpm dev
-```
-
-## 📣 Credits
 
 Crafted with 💻 by Jamal Nadeem
 **GitHub:**https://github.com/ • **LinkedIn:**https://www.linkedin.com/in/jamal-nadeem-488480252/
