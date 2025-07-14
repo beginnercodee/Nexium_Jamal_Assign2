@@ -114,6 +114,11 @@ export default function Home() {
 
 
   const handleSubmit = async () => {
+    if (!url.trim()) {
+  toast.error("Please enter a valid blog URL.");
+  return;
+}
+
     const staticEntry = predefinedSummaries[url.trim()];
 if (staticEntry) {
   setSummary(staticEntry.summary);
