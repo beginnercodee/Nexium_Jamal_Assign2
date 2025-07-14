@@ -90,25 +90,28 @@ export default function Home() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    const confirm = window.confirm(
-      "Are you sure you want to delete this summary?"
-    );
-    if (!confirm) return;
+  const handleDelete = async (id: number, url: string) => {
+  const confirm = window.confirm("Are you sure you want to delete this summary?");
+  if (!confirm) return;
 
-    const { error } = await supabase.from("summaries").delete().eq("id", id);
+  const { error } = await supabase.from("summaries").delete().eq("id", id);
 
-    if (error) {
-      toast.error("Failed to delete summary", {
-        description: "Please try again later or check your connection.",
-      });
-    } else {
-      toast.success("Summary deleted successfully!", {
-        description: "It's gone from your saved list.",
-      });
-      setSavedSummaries((prev) => prev.filter((item) => item.id !== id));
-    }
-  };
+  const mongoDelete = await fetch("/api/delete-content", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url }),
+  });
+
+  if (error || !mongoDelete.ok) {
+    toast.error("Failed to fully delete summary", {
+      description: "It may still exist in one database.",
+    });
+  } else {
+    toast.success("Summary deleted from both MongoDB and Supabase!");
+    setSavedSummaries((prev) => prev.filter((item) => item.id !== id));
+  }
+};
+
 
   const handleSubmit = async () => {
     const staticEntry = predefinedSummaries[url.trim()];
@@ -119,6 +122,12 @@ if (staticEntry) {
   const { error } = await supabase
     .from("summaries")
     .insert([{ url, summary: staticEntry.summary }]);
+
+  await fetch("/api/save-content", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url, content: staticEntry.summary }),
+  });
 
   if (error) {
     toast.error("Failed to save static summary to Supabase.");
@@ -391,7 +400,7 @@ setUrl("");
                           </p>
 
                           <motion.button
-                            onClick={() => handleDelete(summary.id)}
+                            onClick={() => handleDelete(summary.id, summary.url)}
                             whileHover={{ scale: 1.2, opacity: 1 }}
                             transition={{ type: "spring", stiffness: 300 }}
                             className="absolute top-2 right-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition opacity-0 group-hover:opacity-100"
