@@ -110,8 +110,7 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     const staticEntry = predefinedSummaries[url.trim()];
 if (staticEntry) {
   setSummary(staticEntry.summary);
@@ -184,7 +183,7 @@ setUrl("");
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
-      className="relative z-10 flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8 bg-gradient-to-tr from-sky-500 via-indigo-600 to-purple-800 overflow-hidden"
+      className="relative z-10 flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8 bg-gradient-to-tr from-sky-500 via-indigo-600 to-purple-800 dark:from-sky-500 dark:via-indigo-600 dark:to-purple-800 light:from-blue-100 light:via-purple-100 light:to-pink-100 overflow-hidden"
     >
       <ParticlesBG />
       <div className="absolute top-4 right-4">
@@ -216,7 +215,8 @@ setUrl("");
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Card className="mt-6 bg-white/70 dark:bg-black/30 rounded-xl shadow-lg backdrop-blur-md animate-glow-border">
+          <Card className="mt-6 bg-white/80 dark:bg-black/30 backdrop-blur-md rounded-xl shadow-lg animate-glow-border">
+
             <CardContent className="space-y-4 mt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -228,16 +228,16 @@ setUrl("");
               </div>
 
               {showBanner && (
-                <div className="bg-green-100 text-green-800 text-sm px-4 py-2 rounded-lg shadow-md transition">
+                <div className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 text-sm px-4 py-2 rounded-lg shadow-md transition">
                   ✅Blog summarized and saved successfully!
                 </div>
               )}
 
-              <h2 className="text-lg font-semibold text-white dark:text-white">
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
                 🔗 Enter a blog URL to summarize:
               </h2>
 
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-2">
+              <div className="space-y-4 sm:space-y-2">
                 <div className="flex flex-col sm:flex-row gap-3">
                 <Input
                   type="url"
@@ -245,18 +245,8 @@ setUrl("");
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   required
-                  className="flex-1"
+                  className="flex-1 bg-white/90 dark:bg-gray-800/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 />
-                <div className="text-sm text-white/80 dark:text-white/60">
-  Try:
-  <a href="#" onClick={() => setUrl("https://example.com/blog1")} className="underline ml-1">
-    blog1
-  </a>
-  ,
-  <a href="#" onClick={() => setUrl("https://example.com/blog2")} className="underline ml-1">
-    blog2
-  </a>
-</div>
 
                 <motion.div
                   whileHover={{ scale: 1.02 }}
@@ -264,10 +254,10 @@ setUrl("");
                   className="animate-glow-border rounded-md"
                 >
                   <motion.button
-                    type="submit"
+                    onClick={handleSubmit}
                     disabled={isLoading}
                     whileTap={{ scale: 0.97 }}
-                    className="py-2 px-4 rounded-md bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 text-white shadow-md w-full sm:w-auto button"
+                    className="py-2 px-4 rounded-md bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 text-white shadow-md w-full sm:w-auto button font-semibold"
                   >
                     {isLoading ? "Summarizing..." :"🚀 Summarize"}
                   </motion.button>
@@ -276,7 +266,34 @@ setUrl("");
                 {/* Show shimmer loader below the button */}
                 {isLoading && <SummarySkeleton />}
                 </div>
-              </form>
+              </div>
+
+              {/* Demo URLs Section */}
+              <Card className="mt-4 bg-white/60 dark:bg-black/30 border border-gray-200 dark:border-white/20 backdrop-blur-sm">
+
+                <CardContent className="p-4">
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-white/90 mb-3">🎯 Try These Demo URLs:</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      onClick={() => setUrl("https://example.com/blog1")}
+                      className="p-3 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 hover:from-blue-500/30 hover:to-cyan-500/30 border border-blue-300/50 dark:border-blue-300/30 rounded-lg text-left transition-all"
+                    >
+                      <div className="text-sm font-medium text-blue-800 dark:text-blue-200">📈 Productivity Blog</div>
+                      <div className="text-xs text-blue-600 dark:text-blue-200/70 mt-1">Early rising & focus tips</div>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      onClick={() => setUrl("https://example.com/blog2")}
+                      className="p-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 border border-purple-300/50 dark:border-purple-300/30 rounded-lg text-left transition-all"
+                    >
+                      <div className="text-sm font-medium text-purple-800 dark:text-purple-200">🧘 Mindfulness Blog</div>
+                      <div className="text-xs text-purple-600 dark:text-purple-200/70 mt-1">Digital detox & mental health</div>
+                    </motion.button>
+                  </div>
+                </CardContent>
+              </Card>
+
             </CardContent>
           </Card>
         </motion.div>
@@ -291,13 +308,13 @@ setUrl("");
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.4 }}
             >
-              <Card className="mt-6 bg-white/70 dark:bg-black/30 rounded-xl shadow-lg backdrop-blur-md animate-glow-border">
+              <Card className="mt-6 bg-white/80 dark:bg-black/30 rounded-xl shadow-lg backdrop-blur-md animate-glow-border">
                 <CardContent className="space-y-3 p-6">
                   <h2 className="text-lg font-semibold text-gray-800 dark:text-white animate-gradient-shimmer">
                     📝 AI Summary:
                   </h2>
                   <motion.p
-                    className="p-3 rounded-md bg-white/50 dark:bg-white/10 backdrop-blur text-sm text-gray-700 dark:text-gray-100"
+                    className="p-3 rounded-md bg-gray-50 dark:bg-white/10 backdrop-blur text-sm text-gray-700 dark:text-gray-100 border border-gray-200 dark:border-white/20"
                   >
                     {summary}
                   </motion.p>
@@ -305,7 +322,7 @@ setUrl("");
                     🌐 Urdu Translation:
                   </h2>
                   <motion.p
-                    className="p-3 rounded-md bg-white/50 dark:bg-white/10 backdrop-blur text-sm text-gray-700 dark:text-gray-100"
+                    className="p-3 rounded-md bg-gray-50 dark:bg-white/10 backdrop-blur text-sm text-gray-700 dark:text-gray-100 border border-gray-200 dark:border-white/20"
                   >
                     {urduTranslation}
                   </motion.p>
@@ -320,7 +337,7 @@ setUrl("");
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mt-8 text-center text-white/90 dark:text-white/60"
+            className="mt-8 text-center text-gray-700 dark:text-white/90"
           ></motion.div>
         )}
 
@@ -335,71 +352,59 @@ setUrl("");
               transition={{ duration: 0.5 }}
             >
               <motion.div
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  whileHover={{ boxShadow: "0 0 20px rgba(255, 255, 255, 0.15)" }}
-  transition={{ duration: 0.6 }}
->
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                whileHover={{ boxShadow: "0 0 20px rgba(0, 0, 0, 0.1)" }}
+                transition={{ duration: 0.6 }}
+                className="dark:hover:shadow-white/15"
+              >
+                <Card className="bg-white/80 dark:bg-black/30 rounded-xl backdrop-blur-md border border-gray-200 dark:border-white/10 shadow-lg transition-shadow animate-glow-border">
+                  <CardContent className="p-4 space-y-3">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-white animate-gradient-shimmer">
+                      📚 Saved Summaries:
+                    </h2>
 
-              <Card className="bg-white/70 dark:bg-black/30 rounded-xl backdrop-blur-md border border-white/10 shadow-lg transition-shadow animate-glow-border">
-                <CardContent className="p-4 space-y-3">
-                  <h2 className="text-lg font-semibold text-gray-800 dark:text-white animate-gradient-shimmer">
-                    📚 Saved Summaries:
-                  </h2>
-
-                  <AnimatePresence>
-                    {savedSummaries.map((summary, index) => (
-                      <motion.div
-                        key={summary.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.4, delay: index * 0.1 }}
-                        className="group relative p-4 border rounded-lg bg-white/80 dark:bg-gray-900 
-                  hover:shadow-lg hover:shadow-indigo-300/40 
-                  dark:hover:shadow-pink-500/30 transition-all"
-                      >
-                        <a
-                          href={summary.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm font-medium text-blue-600 underline break-words"
+                    <AnimatePresence>
+                      {savedSummaries.map((summary, index) => (
+                        <motion.div
+                          key={summary.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 0.4, delay: index * 0.1 }}
+                          className="group relative p-4 border rounded-lg bg-gray-50 dark:bg-gray-900 
+                            border-gray-200 dark:border-gray-700
+                            hover:shadow-lg hover:shadow-blue-200/50 
+                            dark:hover:shadow-indigo-300/40 
+                            dark:hover:shadow-pink-500/30 transition-all"
                         >
-                          {summary.url}
-                        </a>
-                        <p className="text-sm mt-2 text-gray-800 dark:text-gray-100 transition duration-300 break-words">
-                          {summary.summary}
-                        </p>
+                          <a
+                            href={summary.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm font-medium text-blue-600 dark:text-blue-400 underline break-words hover:text-blue-800 dark:hover:text-blue-300"
+                          >
+                            {summary.url}
+                          </a>
+                          <p className="text-sm mt-2 text-gray-800 dark:text-gray-100 transition duration-300 break-words">
+                            {summary.summary}
+                          </p>
 
-<motion.button
-  onClick={() => handleDelete(summary.id)}
-  whileHover={{ scale: 1.2, opacity: 1 }}
-  transition={{ type: "spring", stiffness: 300 }}
-  className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition opacity-0 group-hover:opacity-100"
-  aria-label="Delete summary"
->
-  <Trash2 className="w-4 h-4" />
-</motion.button>
-
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </CardContent>
-              </Card>
+                          <motion.button
+                            onClick={() => handleDelete(summary.id)}
+                            whileHover={{ scale: 1.2, opacity: 1 }}
+                            transition={{ type: "spring", stiffness: 300 }}
+                            className="absolute top-2 right-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition opacity-0 group-hover:opacity-100"
+                            aria-label="Delete summary"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </motion.button>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </CardContent>
+                </Card>
               </motion.div>
-            </motion.div>
-          </AnimatePresence>
-        )}
-        {savedSummaries.length > 0 && (
-          <AnimatePresence>
-            <motion.div
-              key="saved-list"
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.5 }}
-            >
-              {/* Saved summaries content */}
             </motion.div>
           </AnimatePresence>
         )}
@@ -409,7 +414,7 @@ setUrl("");
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mt-8 text-center text-white/80 dark:text-white/60 space-y-3"
+            className="mt-8 text-center text-gray-700 dark:text-white/80 space-y-3"
           >
             <p className="text-xl font-semibold">🕊️ No saved summaries yet</p>
             <p className="text-sm animate-pulse">
