@@ -285,4 +285,4 @@ Developed with passion for modern web engineering and clean user experience by *
 
 ## 📄 License
 
-Distributed under the **MIT License**. Feel free to use, fork, and build upon this project for educational and commercial purposes.
+Distributed under the [MIT License](LICENSE). Feel free to use, fork, and build upon this project for educational and commercial purposes. See [LICENSE](LICENSE) for full details.
