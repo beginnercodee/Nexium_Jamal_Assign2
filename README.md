@@ -228,15 +228,35 @@ MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/blog_summar
 ```
 
 #### Supabase Database Schema
-Run the following SQL query in your **Supabase SQL Editor** to create the required table:
+Run the following SQL query in your **Supabase SQL Editor** to create the required table with **Row-Level Security (RLS)** enabled:
 
 ```sql
+-- 1. Create table
 CREATE TABLE summaries (
   id BIGSERIAL PRIMARY KEY,
   url TEXT NOT NULL,
   summary TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- 2. Enable Row-Level Security (RLS)
+ALTER TABLE summaries ENABLE ROW LEVEL SECURITY;
+
+-- 3. Configure Policies for anonymous/public access
+CREATE POLICY "Allow public read access"
+ON summaries FOR SELECT
+TO anon, authenticated
+USING (true);
+
+CREATE POLICY "Allow public insert access"
+ON summaries FOR INSERT
+TO anon, authenticated
+WITH CHECK (true);
+
+CREATE POLICY "Allow public delete access"
+ON summaries FOR DELETE
+TO anon, authenticated
+USING (true);
 ```
 
 ---
